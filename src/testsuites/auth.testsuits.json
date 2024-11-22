@@ -1,0 +1,64 @@
+{
+  "testSuites": [
+    {
+      "title": "Checking server running health status"
+    },
+    {
+      "title": "Checking for user registration: /register"
+    },
+    {
+      "title": "Checking for user login: /login"
+    },
+    {
+      "title": "Checking for user WhatsApp login: /whatsAppLogin"
+    },
+    {
+      "title": "Checking for artist onboarding: /onboard"
+    },
+    {
+      "title": "Checking Google login : /google-login"
+    },
+    {
+      "title": "Validation for user onboarding: /onboarding"
+    },
+    {
+      "title": "Checking if user is onboarded : /isOnboarded"
+    },
+    {
+      "title": "Validation for edit profile: /editProfile"
+    },
+    {
+      "title": "Validation for get user profile: /getUserProfile"
+    },
+    {
+      "title": "Validation for get user profile with username: /getUserProfile/:username"
+    },
+    {
+      "title": "Validation for user follow: /follow"
+    },
+    {
+      "title": "Validation for removing a follower: /removeFollower"
+    },
+    {
+      "title": "Validation for fetching the follower list: /getFollowerList"
+    },
+    {
+      "title": "Validation for fetching the following list: /getFollowingList"
+    },
+    {
+      "title": "User Search Functionality: /popular-artists"
+    },
+    {
+      "title": "User Recommendations: /whoToFollow"
+    },
+    {
+      "title": "Fetch Fans by XP: /dashboard/artist/fansByXp"
+    },
+    {
+      "title": "Fetch Specific Fan's Activities by XP: /dashboard/artist/fansByXp/:userid"
+    },
+    {
+      "title": "Protected Search API: /auth/search/:keyword"
+    }
+  ]
+}
