@@ -11,6 +11,17 @@ export const logSuccess = (description: string, result: any) => {
   logger.info({ description, state: "PASS", result });
 };
 
-export const logError = (description: string, error: any) => {
-  logger.info({ description, state: "FAIL", error: error.message });
+export const logError = (
+  description: string,
+  error: any,
+  result: any,
+  status: any
+) => {
+  logger.info({
+    description,
+    state: "FAIL",
+    error: error.message,
+    result,
+    status,
+  });
 };
