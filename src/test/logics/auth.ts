@@ -167,6 +167,9 @@ class AuthMethods {
       throw error;
     }
   };
+
+
+  
 }
 
 export default AuthMethods;

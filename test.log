@@ -1,0 +1,4 @@
+{"level":30,"time":1732627986990,"pid":13876,"hostname":"TechieVivek","description":"Successfully creates a new chat","state":"PASS","result":{"status":true,"message":"Created New Chat"}}
+{"level":30,"time":1732627986998,"pid":13876,"hostname":"TechieVivek","description":"Fails when the token is missing","state":"PASS","result":{"message":{}}}
+{"level":30,"time":1732627987003,"pid":13876,"hostname":"TechieVivek","description":"Fails when the token is invalid","state":"PASS","result":{"message":{"name":"JsonWebTokenError","message":"jwt malformed"}}}
+{"level":30,"time":1732627987014,"pid":13876,"hostname":"TechieVivek","description":"Fails when the payload is invalid","state":"PASS","result":{"errors":{"body":"Unrecognized key(s) in object: 'messsage'"}}}
