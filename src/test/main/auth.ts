@@ -2,7 +2,7 @@ import "dotenv/config";
 import { describe, test } from "vitest";
 import AuthMethods from "../logics/auth";
 
-const auth_api = process.env.AUTH_URL || "http://localhost:7995";
+const auth_api = process.env.SERVER_URL;
 
 export default class AuthTests {
   static authUnitTests() {

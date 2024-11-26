@@ -1,12 +1,9 @@
 import "dotenv/config";
 import { expect } from "vitest";
 import { logSuccess, logError } from "../helpers/logger";
-import { Console } from "console";
 
-const authToken =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjI4NiwiYWN0aXZlQ2hhdElkIjoxNDAxLCJpc1ByZW1pdW0iOmZhbHNlLCJpYXQiOjE3MzI2MTQ1MzF9.FOzEqRwKaRa5jK2wdeJG5k7V-72_AstzWVoGYKFUfy4";
-
-const auth_api = process.env.AUTH_URL || "http://localhost:7995";
+const userAuthToken = process.env.USER_AUTH_TOKEN;
+const auth_api = process.env.SERVER_URL;
 
 const v = {
   validRegisterPayload: {
@@ -44,7 +41,7 @@ const jsonHeader = {
 
 const authHeaders = {
   "Content-Type": "application/json",
-  Authorization: "Bearer " + authToken,
+  Authorization: "Bearer " + userAuthToken,
 };
 
 class AuthMethods {
