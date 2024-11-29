@@ -97,10 +97,7 @@ export default class UserTests {
           "Test 5.1: Successfully submits a contact request",
           UserMethods.successfulContact
         );
-        test(
-          "Test 5.2: Fails when `name` is missing", 
-           UserMethods.missingName
-        );
+        test("Test 5.2: Fails when `name` is missing", UserMethods.missingName);
         test(
           "Test 5.3: Fails when `number` is missing",
           UserMethods.missingNumber
@@ -116,6 +113,48 @@ export default class UserTests {
         test(
           "Test 5.6: Fails with extra fields in the request body",
           UserMethods.extraFields
+        );
+      });
+
+      describe("User API: POST /checkout", () => {
+        test(
+          "Test 6.1: Successfully processes a valid payment",
+          UserMethods.successfulPayment
+        );
+        test(
+          "Test 6.2: Fails for unauthorized access (missing token)",
+          UserMethods.unauthorizedAccess
+        );
+        test(
+          "Test 6.3: Fails when `amount` is invalid",
+          UserMethods.invalidAmount
+        );
+        test(
+          "Test 6.4: Fails when user details are not found",
+          UserMethods.userNotFound
+        );
+      });
+
+      describe("User API: POST /cashfree", () => {
+        test(
+          "Test 7.1: Successfully processes a valid payment order",
+          UserMethods.successfulPaymentOrder
+        );
+        test(
+          "Test 7.2: Fails for unauthorized access (missing token)",
+          UserMethods.cashfreeunauthorizedAccess
+        );
+        test(
+          "Test 7.3: Fails when `amount` is invalid",
+          UserMethods.cashfreeinvalidAmount
+        );
+        test(
+          "Test 7.4: Fails when user details are not found",
+          UserMethods.cashfreeuserNotFound
+        );
+        test(
+          "Test 7.5: Fails when `phone` is invalid",
+          UserMethods.cashfreeInvalidPhone
         );
       });
     });

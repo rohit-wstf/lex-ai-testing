@@ -1,7 +1,8 @@
 import "dotenv/config";
 import { expect } from "vitest";
+import axios from "axios";
 import { logSuccess, logError } from "../helpers/logger";
-import { Console, error } from "console";
+// import { Console, error } from "console";
 
 const auth_api = process.env.AUTH_URL || "http://localhost:7995";
 
@@ -116,9 +117,28 @@ const v5 = {
   },
 };
 
-const jsonHeader4 = {
-  "Content-Type": "application/json",
-  Authorization: "Bearer valid_token", // Replace with valid token for testing
+const v6 = {
+  validPayment: {
+    amount: 49,
+  },
+  invalidAmount: {
+    amount: 75,
+  },
+};
+
+const v7 = {
+  validPayment: {
+    amount: 49,
+    customerPhone: "1234567890",
+  },
+  invalidAmount: {
+    amount: 75,
+    customerPhone: "1234567890",
+  },
+  invalidPhone: {
+    amount: 49,
+    customerPhone: "abc123", // Invalid phone number (e.g., alphanumeric)
+  },
 };
 
 const jsonHeader = {
@@ -134,6 +154,8 @@ const testUser1token =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjMyMCwiYWN0aXZlQ2hhdElkIjoxNTc1LCJpc1ByZW1pdW0iOmZhbHNlLCJpYXQiOjE3MzI2MDczMzR9.-S1bRxI1Vx7y2c5KeR5-7yTqMg-vGAF6G4nXMwOPyBA";
 
 class UserMethods {
+  // Test: Health Check
+
   // Test 1.1: Successfully creates a new chat
   static successfulCreateNewChat = async () => {
     let status = null;
@@ -631,15 +653,12 @@ class UserMethods {
 
       // console.log(result);
 
-     
       expect(status).toBe(200);
       expect(result).toMatchObject({
         status: true,
         message: "Support request submitted",
         data: expect.arrayContaining([
-          
           expect.objectContaining({
-          
             message: expect.any(String),
           }),
         ]),
@@ -698,7 +717,7 @@ class UserMethods {
       expect(result).toMatchObject({
         errors: expect.objectContaining({
           "body.number": expect.any(String),
-        })
+        }),
       });
 
       logSuccess("Fails when `number` is missing", result);
@@ -781,7 +800,7 @@ class UserMethods {
       expect(status).toBe(400);
       expect(result).toMatchObject({
         errors: expect.objectContaining({
-          "body": expect.any(String),
+          body: expect.any(String),
         }),
       });
 
@@ -797,12 +816,270 @@ class UserMethods {
     }
   };
 
+  // Test 6.1: Successfully processes a valid payment
+  static successfulPayment = async () => {
+    let status = null;
+    let result = null;
+    try {
+      const res = await fetch(`${auth_api}/user/checkout`, {
+        method: "POST",
+        headers: authHeader(testUser1token),
+        body: JSON.stringify(v6.validPayment),
+      });
 
+      result = await res.json();
+      status = res.status;
 
+      expect(status).toBe(200);
+      expect(result).toMatchObject({
+        status: true,
+        message: "Payment Details Inserted",
+        data: { orderId: expect.any(String) },
+      });
+
+      logSuccess("Successfully processes a valid payment", result);
+    } catch (error: any) {
+      logError("Successfully processes a valid payment", error, result, status);
+      throw error;
+    }
+  };
+
+  // Test 6.2 : Fails for unauthorized access (missing token)
+  static unauthorizedAccess = async () => {
+    let status = null;
+    let result = null;
+    try {
+      const res = await fetch(`${auth_api}/user/checkout`, {
+        method: "POST",
+        headers: jsonHeader, // No token provided
+        body: JSON.stringify(v6.validPayment),
+      });
+
+      result = await res.json();
+      status = res.status;
+
+      expect(status).toBe(400);
+      expect(result).toMatchObject({
+        message: expect.any(Object),
+      });
+
+      logSuccess("Fails for unauthorized access (missing token)", result);
+    } catch (error: any) {
+      logError(
+        "Fails for unauthorized access (missing token)",
+        error,
+        result,
+        status
+      );
+      throw error;
+    }
+  };
+
+  // Test 6.3: Fails when `amount` is invalid
+  static invalidAmount = async () => {
+    let status = null;
+    let result = null;
+    try {
+      const res = await fetch(`${auth_api}/user/checkout`, {
+        method: "POST",
+        headers: authHeader(testUser1token),
+        body: JSON.stringify(v6.invalidAmount),
+      });
+
+      result = await res.json();
+      status = res.status;
+
+      expect(status).toBe(500);
+      expect(result).toMatchObject({
+        status: false,
+        message: expect.stringContaining("Invalid amount"),
+      });
+
+      logSuccess("Fails when `amount` is invalid", result);
+    } catch (error: any) {
+      logError("Fails when `amount` is invalid", error, result, status);
+      throw error;
+    }
+  };
+
+  // Test 6.4: Fails when user details are not found
+  static userNotFound = async () => {
+    let status = null;
+    let result = null;
+    try {
+      const res = await fetch(`${auth_api}/user/checkout`, {
+        method: "POST",
+        headers: authHeader("abcdefg"),
+        body: JSON.stringify(v6.validPayment),
+      });
+
+      result = await res.json();
+      status = res.status;
+
+      expect(status).toBe(400);
+      expect(result).toMatchObject({
+        message: expect.objectContaining({
+          name: "JsonWebTokenError",
+          message: "jwt malformed",
+        }),
+      });
+
+      logSuccess("Fails when user details are not found", result);
+    } catch (error: any) {
+      logError("Fails when user details are not found", error, result, status);
+      throw error;
+    }
+  };
+
+  // Test 7.1: Successfully processes a valid payment order
+  static successfulPaymentOrder = async () => {
+    let status = null;
+    let result = null;
+    try {
+      const res = await fetch(`${auth_api}/user/cashfree`, {
+        method: "POST",
+        headers: authHeader(testUser1token),
+        body: JSON.stringify(v7.validPayment),
+      });
+
+      result = await res.json();
+      status = res.status;
+
+      expect(status).toBe(200);
+      expect(result).toMatchObject({
+        status: true,
+        message: "Payment Details Inserted",
+        data: {
+          orderId: expect.any(String),
+          sessionId: expect.any(String),
+        },
+      });
+
+      logSuccess("Successfully processes a valid payment order", result);
+    } catch (error: any) {
+      logError(
+        "Successfully processes a valid payment order",
+        error,
+        result,
+        status
+      );
+      throw error;
+    }
+  };
+
+  // Test 7.2: Fails for unauthorized access (missing token)
+  static cashfreeunauthorizedAccess = async () => {
+    let status = null;
+    let result = null;
+    try {
+      const res = await fetch(`${auth_api}/user/cashfree`, {
+        method: "POST",
+        headers: authHeader(null),
+        body: JSON.stringify(v7.validPayment),
+      });
+
+      result = await res.json();
+      status = res.status;
+
+      expect(status).toBe(400);
+      expect(result).toMatchObject({
+        message: expect.any(Object),
+      });
+
+      logSuccess("Fails for unauthorized access (missing token)", result);
+    } catch (error: any) {
+      logError(
+        "Fails for unauthorized access (missing token)",
+        error,
+        result,
+        status
+      );
+      throw error;
+    }
+  };
+
+  // Test 7.3: Fails when `amount` is invalid
+  static cashfreeinvalidAmount = async () => {
+    let status = null;
+    let result = null;
+    try {
+      const res = await fetch(`${auth_api}/user/cashfree`, {
+        method: "POST",
+        headers: authHeader(testUser1token),
+        body: JSON.stringify(v7.invalidAmount),
+      });
+
+      result = await res.json();
+      status = res.status;
+
+      expect(status).toBe(500);
+      expect(result).toMatchObject({
+        error: expect.any(String),
+      });
+
+      logSuccess("Fails when `amount` is invalid", result);
+    } catch (error: any) {
+      logError("Fails when `amount` is invalid", error, result, status);
+      throw error;
+    }
+  };
+
+  // Test 7.4: Fails when user details are not found
+  static cashfreeuserNotFound = async () => {
+    let status = null;
+    let result = null;
+    try {
+      const res = await fetch(`${auth_api}/user/cashfree`, {
+        method: "POST",
+        headers: authHeader("abcdefg"),
+        body: JSON.stringify(v7.validPayment),
+      });
+
+      result = await res.json();
+      status = res.status;
+
+      expect(status).toBe(400);
+      expect(result).toMatchObject({
+        message: expect.objectContaining({
+          name: "JsonWebTokenError",
+          message: "jwt malformed",
+        }),
+      });
+
+      logSuccess("Fails when user details are not found", result);
+    } catch (error: any) {
+      logError("Fails when user details are not found", error, result, status);
+      throw error;
+    }
+  };
+
+  // Test 7.5: Fails when `customerPhone` is invalid
+  static cashfreeInvalidPhone = async () => {
+    let status = null;
+    let result = null;
+    try {
+      const res = await fetch(`${auth_api}/user/cashfree`, {
+        method: "POST",
+        headers: authHeader(testUser1token),
+        body: JSON.stringify(v7.invalidPhone),
+      });
+
+      result = await res.json();
+      status = res.status;
+
+      expect(status).toBe(500);
+      expect(result).toMatchObject({
+        error: expect.any(String),
+      });
+
+      logSuccess("Fails when `customerPhone` is invalid", result);
+    } catch (error: any) {
+      logError("Fails when `customerPhone` is invalid", error, result, status);
+      throw error;
+    }
+  };
 
 
 }
-
-
 
 export default UserMethods;

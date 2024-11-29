@@ -30,6 +30,7 @@ export default class AuthTests {
           AuthMethods.missingOrExtraDataRegister
         );
       });
+      
     });
   }
 }
