@@ -1,4 +1,5 @@
 import AuthTests from "./auth";
+import UserTests from "./user";
 import LibraryTests from "./library";
 import SuggestionTests from "./suggestions";
 import VideoTests from "./video";
@@ -8,4 +9,6 @@ export default {
   LibraryTests,
   VideoTests,
   SuggestionTests,
+  UserTests
+  
 };
